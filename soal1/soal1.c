@@ -9,8 +9,6 @@
 #include <string.h>
 #include <time.h>
 #include <wait.h>
-#include <signal.h>
-
 
 int main(int argc, char *argv[]) {
   if (argc != 5) {
@@ -35,7 +33,6 @@ int main(int argc, char *argv[]) {
   }
 
   pid_t pid, sid;
-
   pid = fork();
 
   if (pid < 0) {
@@ -53,15 +50,16 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-
   close(STDIN_FILENO);
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
 
   while (1) {
+
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
     char jam[5], menit[5], detik[5];
+
     strftime(jam, 5, "%H", tm);
     strftime(menit, 5, "%M", tm);
     strftime(detik, 5, "%S", tm);
@@ -69,19 +67,21 @@ int main(int argc, char *argv[]) {
     if ((strcmp(argv[1], detik) == 0) || *argv[1] == '*') {
       if ((strcmp(argv[2], menit) == 0) || *argv[2] == '*') {
         if ((strcmp(argv[3], jam) == 0) || *argv[3] == '*') {
-          pid_t child_id;
 
+          pid_t child_id;
           child_id = fork();
 
           if (child_id == 0) {
+
             char *argvChild[] = {"bash", argv[4], NULL};
             execv("/bin/bash", argvChild);
-          } else if (child_id > 0) {
-            while(wait(NULL) > 0);
+
           }
+          while(wait(NULL) > 0);
         }
       }
     }
+    
     sleep(1);
   }
 }
