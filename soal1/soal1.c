@@ -15,19 +15,23 @@
 int main(int argc, char *argv[]) {
   if (argc != 5) {
     printf("ERROR! Argumen Salah\n");
-    return 0;
+    return 1;
   }
   if (!(*argv[1] == '*' || (atoi(argv[1]) >= 0 && atoi(argv[1]) <= 59))) {
     printf("ERROR! Argumen Salah\n");
-    return 0;
+    return 1;
   }
   if (!(*argv[2] == '*' || (atoi(argv[2]) >= 0 && atoi(argv[2]) <= 59))) {
     printf("ERROR! Argumen Salah\n");
-    return 0;
+    return 1;
   }
   if (!(*argv[3] == '*' || (atoi(argv[3]) >= 0 && atoi(argv[3]) <= 23))) {
     printf("ERROR! Argumen Salah\n");
-    return 0;
+    return 1;
+  }
+  if (access(argv[4], F_OK) == -1) {
+    printf("ERROR! File tidak ada\n");
+    return 1;
   }
 
   pid_t pid, sid;
