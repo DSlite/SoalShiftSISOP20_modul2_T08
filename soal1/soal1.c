@@ -40,8 +40,6 @@ int main(int argc, char *argv[]) {
     exit(EXIT_SUCCESS);
   }
 
-  umask(0);
-
   sid = setsid();
   if (sid < 0) {
     exit(EXIT_FAILURE);
