@@ -2,10 +2,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
 #include <unistd.h>
-#include <syslog.h>
 #include <string.h>
 #include <time.h>
 #include <wait.h>
@@ -64,9 +61,9 @@ int main(int argc, char *argv[]) {
     strftime(menit, 5, "%M", tm);
     strftime(detik, 5, "%S", tm);
 
-    if ((strcmp(argv[1], detik) == 0) || *argv[1] == '*') {
-      if ((strcmp(argv[2], menit) == 0) || *argv[2] == '*') {
-        if ((strcmp(argv[3], jam) == 0) || *argv[3] == '*') {
+    if (atoi(argv[1]) == atoi(detik) || *argv[1] == '*') {
+      if (atoi(argv[2]) == atoi(menit) || *argv[2] == '*') {
+        if (atoi(argv[3]) == atoi(jam) || *argv[3] == '*') {
 
           pid_t child_id;
           child_id = fork();
@@ -81,7 +78,7 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    
+
     sleep(1);
   }
 }
