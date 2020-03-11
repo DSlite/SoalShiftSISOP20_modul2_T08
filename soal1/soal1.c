@@ -1,9 +1,7 @@
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 #include <time.h>
 #include <wait.h>
 
@@ -53,15 +51,10 @@ int main(int argc, char *argv[]) {
 
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
-    char jam[5], menit[5], detik[5];
 
-    strftime(jam, 5, "%H", tm);
-    strftime(menit, 5, "%M", tm);
-    strftime(detik, 5, "%S", tm);
-
-    if (atoi(argv[1]) == atoi(detik) || *argv[1] == '*') {
-      if (atoi(argv[2]) == atoi(menit) || *argv[2] == '*') {
-        if (atoi(argv[3]) == atoi(jam) || *argv[3] == '*') {
+    if (atoi(argv[1]) == tm->tm_sec || *argv[1] == '*') {
+      if (atoi(argv[2]) == tm->tm_min || *argv[2] == '*') {
+        if (atoi(argv[3]) == tm->tm_hour || *argv[3] == '*') {
 
           pid_t child_id;
           child_id = fork();
