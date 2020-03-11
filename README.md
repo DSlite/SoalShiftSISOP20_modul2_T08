@@ -21,7 +21,7 @@ Kelompok T08
 ---
 
 ## Soal 1
-Source Code : [source](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal1.c)
+Source Code : [source](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal1/soal1.c)
 
 **Deskripsi:**\
 Buatlah program C yang menyerupai crontab untuk menjalankan script bash dengan ketentuan sebagai berikut:
