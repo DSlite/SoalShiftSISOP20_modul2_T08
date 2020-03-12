@@ -9,9 +9,18 @@
 #include <dirent.h>
 
 int main() {
+
   pid_t child_id = fork();
   if (child_id == 0) {
-    char *argv[] = {"mkdir", "-p", "/home/umum/modul2/indomie", "/home/umum/modul2/sedaap", NULL};
+    char *argv[] = {"mkdir", "-p", "/home/umum/modul2/indomie", NULL};
+    execv("/bin/mkdir", argv);
+  }
+  while(wait(NULL) != child_id);
+  sleep(5)
+
+  child_id = fork();
+  if (child_id == 0) {
+    char *argv[] = {"mkdir", "-p", "/home/umum/modul2/sedaap", NULL};
     execv("/bin/mkdir", argv);
   }
   while(wait(NULL) != child_id);
@@ -42,7 +51,9 @@ int main() {
 
     sprintf(location, "/home/umum/modul2/jpg/%s", token);
     stat(location, &location_stat);
+
     if (S_ISDIR(location_stat.st_mode)) {
+
       child_id = fork();
       if (child_id == 0) {
         char *argv[] = {"mv", location, "/home/umum/modul2/indomie", NULL};
@@ -67,17 +78,20 @@ int main() {
       }
 
     } else if (S_ISREG(location_stat.st_mode)) {
+
       child_id = fork();
       if (child_id == 0) {
         char *argv[] = {"mv", location, "/home/umum/modul2/sedaap", NULL};
         execv("/bin/mv", argv);
       }
       while(wait(NULL) != child_id);
+
     }
+
     token = strtok(NULL, "\n");
+    
   }
 
   closedir(dr);
-  return 0;
 
 }

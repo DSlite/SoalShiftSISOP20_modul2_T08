@@ -1,11 +1,10 @@
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 #include <time.h>
 #include <wait.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -35,6 +34,7 @@ int main(int argc, char *argv[]) {
 
   FILE *pFile;
   pFile = fopen("killer.c", "w");
+
   if (strcmp(argv[1], "-a") == 0) {
     char *inp = ""
     "#include <unistd.h>\n"
@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     "}\n";
     fprintf(pFile, inp, sid);
   }
+
   if (strcmp(argv[1], "-b") == 0) {
     char *inp = ""
     "#include <unistd.h>\n"
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
     "}\n";
     fprintf(pFile, inp, getpid());
   }
+
   fclose(pFile);
 
   pid = fork();
@@ -102,11 +104,13 @@ int main(int argc, char *argv[]) {
     }
 
     child_id = fork();
-
     if (child_id == 0) {
+
       for (int i = 0; i < 20; i++) {
-        pid_t exec_id = fork();
-        if (exec_id == 0) {
+
+        child_id = fork();
+        if (child_id == 0) {
+
           t = time(NULL);
           tm = localtime(&t);
           char new_now[80], location[160], link[80];
@@ -115,22 +119,30 @@ int main(int argc, char *argv[]) {
           sprintf(link, "https://picsum.photos/%ld", ((t%1000)+100));
           char *argv[] = {"wget", "-O", location, link, NULL};
           execv("/usr/bin/wget", argv);
+
         }
+
         sleep(5);
+
       }
 
       child_id = fork();
-
       if (child_id == 0) {
+
         char nama_file[80];
         sprintf(nama_file, "%s.zip", now);
         char *argv[] = {"zip", "-r", nama_file, now, NULL};
         execv("/usr/bin/zip", argv);
+
       }
+
       while(wait(NULL) != child_id);
       char *argv[] = {"rm", "-r", now, NULL};
       execv("/bin/rm", argv);
+
     }
+
     sleep(30);
+
   }
 }
