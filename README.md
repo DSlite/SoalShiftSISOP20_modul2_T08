@@ -183,6 +183,8 @@ Jika kondisi sebelumnya terpenuhi, maka program akan mengeksekusi *shell script*
 **Contoh Output Jika File Shell Script Tidak Ada:**\
 ![Output Soal 1-4](https://user-images.githubusercontent.com/17781660/76400554-17ee2400-63b3-11ea-9505-9270a6715594.png)
 
+---
+
 ## Soal 2
 Source Code : [soal2.c](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal2/soal2.c)
 
@@ -499,6 +501,8 @@ Lalu, pada proses mendefinisian string untuk diinputkan pada [Soal 2.d.](#soal-2
 
 **Contoh Output Jika Tidak Memasukkan MODE:**\
 ![Output Soal 2-4](https://user-images.githubusercontent.com/17781660/76580502-c18ffb00-6502-11ea-907b-2c075b432124.png))
+
+---
 
 ## Soal 3
 Source Code : [soal3.c](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal3/soal3.c)
