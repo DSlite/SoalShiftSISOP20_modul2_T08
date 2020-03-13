@@ -345,9 +345,10 @@ Lalu, pada masing-masing loop akan dibuat *child process* yang dimana masing-mas
 Agar rapi, setelah sebuah folder telah terisi oleh 20 gambar, folder akan di zip dan folder akan di delete(sehingga hanya menyisakan .zip).
 
 **Pembahasan:**\
-Untuk melakukan zip, maka setelah `for` loop pada soal sebelumnya selesai, akan melakukan `fork()` lagi. Dimana *child process* akan melakukan zip terhadap folder tersebut. dan *parent process* akan menunggu *child process* selesai dan menghapus directory folder yang telah di zip.
+Untuk melakukan zip, maka setelah `for` loop pada soal sebelumnya selesai, *parent process* akan menunggu sampai seluruh ***download*** `wget` selesai. Lalu akan melakukan `fork()` lagi. Dimana *child process* akan melakukan zip terhadap folder tersebut. dan *parent process* akan menunggu *child process* selesai dan menghapus directory folder yang telah di zip.
 
 ```c
+while(wait(NULL) > 0);
 child_id = fork();
 if (child_id == 0) {
 

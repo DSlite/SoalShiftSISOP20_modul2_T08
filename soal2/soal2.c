@@ -126,6 +126,7 @@ int main(int argc, char *argv[]) {
 
       }
 
+      while(wait(NULL) > 0);
       child_id = fork();
       if (child_id == 0) {
 
