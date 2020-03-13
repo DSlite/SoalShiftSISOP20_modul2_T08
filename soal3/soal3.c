@@ -16,7 +16,7 @@ int main() {
     execv("/bin/mkdir", argv);
   }
   while(wait(NULL) != child_id);
-  sleep(5)
+  sleep(5);
 
   child_id = fork();
   if (child_id == 0) {
@@ -42,6 +42,8 @@ int main() {
     }
     sprintf(f_name+strlen(f_name), "%s\n", de->d_name);
   }
+
+  closedir(dr);
 
   char *token = strtok(f_name, "\n");
 
@@ -89,9 +91,7 @@ int main() {
     }
 
     token = strtok(NULL, "\n");
-    
-  }
 
-  closedir(dr);
+  }
 
 }

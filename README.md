@@ -515,16 +515,73 @@ Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia memp
 ### Soal 3.a.
 
 **Deskripsi:**\
-Program buatan jaya harus bisa membuat dua direktir di **"/home/[USER]/modul2/"**. Direktori yang pertama diberi nama **"indomie"**, lalu lima detik kemudian membuat direktori yang kedua bernama **"sedaap"**.
+Program buatan jaya harus bisa membuat dua direktori di **"/home/[USER]/modul2/"**. Direktori yang pertama diberi nama **"indomie"**, lalu lima detik kemudian membuat direktori yang kedua bernama **"sedaap"**.
 
 **Pembahasan:**\
+Pertama, kami akan melakukan `#include` library yang diperlukan
+
+```c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+#include <wait.h>
+#include <dirent.h>
+```
+
+Library yang digunakan untuk soal ini mirip dengan soal sebelumnya. Disini hanya ditambahkan `#include <dirent.h>` yang digunakan untuk membuka isi directory (e.g. `readdir()`).
+
+```c
+int main() {
+
+  pid_t child_id = fork();
+  if (child_id == 0) {
+    char *argv[] = {"mkdir", "-p", "/home/umum/modul2/indomie", NULL};
+    execv("/bin/mkdir", argv);
+  }
+  while(wait(NULL) != child_id);
+  sleep(5)
+
+  child_id = fork();
+  if (child_id == 0) {
+    char *argv[] = {"mkdir", "-p", "/home/umum/modul2/sedaap", NULL};
+    execv("/bin/mkdir", argv);
+  }
+  while(wait(NULL) != child_id);
+
+  ...
+
+}
+```
+
+*note: tanda `...` merupakan kode program yang tidak ditampilkan untuk memudahkan pembacaan, untuk lebih detail dapat dilihat pada [soal2.c](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal3/soal3.c)*
+
+* *Parent process* akan membuat *child process* dimana dia akan membuat direktori pada `/home/umum/modul2/indomie` menggunakan perintah `mkdir`. Disini *argument* `-p` digunakan agar directory yang belum dibuat (seperti `/home/umum/modul2`) langsung terbuat.
+* Lalu *parent process* akan menunggu mkdir selesai dibuat, lalu akan `sleep()` selama 5 detik. Lalu *parent process* akan membuat *child process* lagi untuk membuat direktoripada `/home/umum/modul2/sedaap`. Lalu *parent process* akan menunggu *child process* selesai.
 
 ### Soal 3.b.
 
 **Deskripsi:**\
-Kemudian program tersebut harus meng-ekstrak file **jpg.zip** di direktori **"/home/[USER]/modul2/". Setelah tugas sebelumnya selesai, ternyata tidak hanya itu tugasnya.
+Kemudian program tersebut harus meng-ekstrak file **jpg.zip** di direktori **"/home/[USER]/modul2/"**. Setelah tugas sebelumnya selesai, ternyata tidak hanya itu tugasnya.
 
 **Pembahasan:**\
+Untuk meng-ekstrak file **jpg.zip** dapat menggunakan perintah `unzip`.
+
+```c
+child_id = fork();
+if (child_id == 0) {
+  char *argv[] = {"unzip", "-q", "jpg.zip", "-d", "/home/umum/modul2", NULL};
+  execv("/usr/bin/unzip", argv);
+}
+while(wait(NULL) != child_id);
+```
+
+* *argument* `-q` digunakan agar process **unzip** tidak mengeluarkan output ke terminal.
+* *argument* `-d` untuk menyatakan *directory* output hasil ekstrak.
+
 
 ### Soal 3.c.
 
@@ -532,6 +589,86 @@ Kemudian program tersebut harus meng-ekstrak file **jpg.zip** di direktori **"/h
 Diberilah tugas baru yaitu setelah di ekstrak, hasil dari ekstrakan tersebut (di dalam direktori **"/home/[USER]/modul2/jpg/"**) harus dipindahkan sesuai dengan pengelompokan, semua file harus dipindahkan ke **"/home/[USER]/modul2/sedaap/"** dan semua direktori harus dipindahkan ke **"/home[USER]/modul2/indomie/"**.
 
 **Pembahasan:**\
+Pertama, kami melakukan *entry* terhadap isi directory `/home/umum/modul2/jpg` menggunakan library `<dirent.h>`.
+
+```c
+char f_name[256];
+struct dirent *de;
+DIR *dr = opendir("/home/umum/modul2/jpg");
+
+while((de = readdir(dr)) != NULL) {
+  if (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0) {
+    continue;
+  }
+  sprintf(f_name+strlen(f_name), "%s\n", de->d_name);
+}
+
+closedir(dr);
+```
+
+* `f_name` akan menyimpan seluruh *entry* yang terdapat dalam folder `/home/umum/modul2/jpg`.
+* `de` akan menyimpan *entry* ketika melakukan iterasi.
+* `dr` akan sebagai pointer ke directory `/home/umum/modul2/jpg`.
+* Lalu iterasi akan dilakukan dengan menggunakan fungsi `readdir()` terhadap directory `dr` dan *entry* diinputkan pada `de`.
+* Jika nama *entry* tersebut adalah `"."` atau `".."` maka tidak akan dimasukkan kedalam `f_name`.
+* Lalu untuk memasukkan nama *entry* tersebut, kami menggunakan fungsi `sprintf()` dengan menggunakan delimiter `\n`.
+* Lalu directory tersebut akan ditutup koneksinya dengan menggunakan fungsi `closedir()`.
+
+```c
+char *token = strtok(f_name, "\n");
+
+while (token != NULL) {
+
+  ...
+
+  token = strtok(NULL, "\n");
+
+}
+```
+
+*note: tanda `...` merupakan kode program yang tidak ditampilkan untuk memudahkan pembacaan, untuk lebih detail dapat dilihat pada [soal2.c](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal3/soal3.c)*
+
+Lalu kami akan menggunakan fungsi `strtok()` untuk melakukan iterasi pada masing-masing nama file dengan menggunakan delimiter yang sudah di-*set* tadi (`\n`).
+
+```c
+char location[80];
+struct stat location_stat;
+
+sprintf(location, "/home/umum/modul2/jpg/%s", token);
+stat(location, &location_stat);
+
+if (S_ISDIR(location_stat.st_mode)) {
+
+  child_id = fork();
+  if (child_id == 0) {
+    char *argv[] = {"mv", location, "/home/umum/modul2/indomie", NULL};
+    execv("/bin/mv", argv);
+  }
+  while(wait(NULL) != child_id);
+
+  ...
+
+} else if (S_ISREG(location_stat.st_mode)) {
+
+  child_id = fork();
+  if (child_id == 0) {
+    char *argv[] = {"mv", location, "/home/umum/modul2/sedaap", NULL};
+    execv("/bin/mv", argv);
+  }
+  while(wait(NULL) != child_id);
+
+}
+```
+
+*note: tanda `...` merupakan kode program yang tidak ditampilkan untuk memudahkan pembacaan, untuk lebih detail dapat dilihat pada [soal2.c](https://github.com/DSlite/SoalShiftSISOP20_modul2_T08/blob/master/soal3/soal3.c)*
+
+Untuk masing-masing nama *entry*, akan dilakukan operasi sebagai berikut:
+
+* deklarasi `location` untuk lokasi *entry* tersebut, dan `location_stat` yang akan digunakan untuk mengecek apakah dia merupakan file biasa atau sebuah directory.
+* `sprintf()` digunakan untuk menginputkan lokasi kedalam variable `location`
+* `stat()` digunakan untuk mendapatkan ***stat*** dari *entry* tersebut.
+* Lalu *entry* tersebut akan dicek menggunakan **macros** `S_ISDIR()` untuk mengecek apakah *entry* tersebut directory dan `S_ISREG()` untuk mengecek apakah *entry* tersebut file biasa atau bukan.
+* Lalu untuk masing masing *entry* tersebut akan dilakukan `mv` untuk memindahkan file / directory tersebut kedalam lokasi yang diminta.
 
 ### Soal 3.d.
 
@@ -539,7 +676,30 @@ Diberilah tugas baru yaitu setelah di ekstrak, hasil dari ekstrakan tersebut (di
 Untuk setiap direktori yang dipindahkan ke **"/home/[USER]/modul2/indomie/"** harus membuat dua file kosong. File yang pertama diberi nama **"coba1.txt"**, lalu 3 detik kemudian membuat file bernama **"coba2.txt"**. (contoh : **"/home/[USER]/modul2/indomie/{nama_folder}/coba1.txt"**).
 
 **Pembahasan:**\
+Proses ini dilakukan setelah *entry* bertipe directory dipindahkan menggunakan `mv`.
+
+```c
+char new_location[80];
+child_id = fork();
+if (child_id == 0) {
+  sprintf(new_location, "/home/umum/modul2/indomie/%s/coba1.txt", token);
+  char *argv[] = {"touch", new_location, NULL};
+  execv("/usr/bin/touch", argv);
+}
+
+child_id = fork();
+if (child_id == 0) {
+  sleep(3);
+  sprintf(new_location, "/home/umum/modul2/indomie/%s/coba2.txt", token);
+  char *argv[] = {"touch", new_location, NULL};
+  execv("/usr/bin/touch", argv);
+}
+```
+
+Pertama, kami mendeklarasikan variable `new_location` untuk menyimpan alamat directory yang telah dipindahkan. Lalu akan melakukan `fork()` dimana *child process* akan membuat file `coba1.txt` pada `new_location` menggunakan perintah `touch`. Lalu *parent process* akan melakukan `fork()` lagi, tetapi pada *child process* akan melakukan `sleep` selama 3 detik terlebih dahulu, lalu akan membuat file `coba2.txt` pada `new_location`.
 
 #### ScreenShot
 
-**Contoh:**\
+**Contoh Output:**\
+![Output Soal 3-1](https://user-images.githubusercontent.com/17781660/76583819-d83b4f80-650c-11ea-95a1-5fea99d9da36.png)
+![Output Soal 3-2](https://user-images.githubusercontent.com/17781660/76583822-d96c7c80-650c-11ea-883e-94b13f7b0eee.png)
