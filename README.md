@@ -37,6 +37,9 @@ Buatlah program C yang menyerupai crontab untuk menjalankan script bash dengan k
 
 Contoh: `./program \* 34 7 /home/somi/test.sh`
 
+**Asumsi Soal:**\
+Soal meminta kami untuk membuat program C yang bekerja menyerupai crontab. Dimana prosesnya akan berupa daemon, dan menjalankan file bash yang diinputkan setiap waktu yang diinginkan yang dimasukkan ke dalam *arguments*. Untuk melakukan pengecekan terhadap waktu, kelompok kami menjalankan crontab setiap detik, dimana tiap detik akan dicek apakah waktu **saat ini** sesuai dengan *arguments* yang diinputkan. Jika sesuai maka, file bash yang diinputkan akan dijalankan.
+
 **Pembahasan:**\
 Untuk membuat program C yang berjalan di background, pertama harus melakukan `#include` terhadap library yang diperlukan
 
@@ -170,18 +173,24 @@ while(wait(NULL) > 0);
 
 Jika kondisi sebelumnya terpenuhi, maka program akan mengeksekusi *shell script* yang diinputkan. Pertama, kita perlu melakukan `fork()` dimana *child process* akan menjalankan *shell script*-nya, dan *parent process* akan menunggu *child process*-nya selesai mengeksekusi *shell script* tersebut.
 
+#### Kesulitan
+Tidak ada.
+
 #### ScreenShot
 **Contoh Output Berhasil:**\
 ![Output Soal 1-1](https://user-images.githubusercontent.com/17781660/76401535-9c8d7200-63b4-11ea-96ba-04edb884761e.png)
+*Screenshot* diatas merupakan contoh dari eksekusi program C dengan argumen yang sesuai. Program C tersebut akan menjalankan file `/home/umum/test.sh` setiap detik pada jam 16 menit 21. Jika dilihat akan muncul directory 16:21:00 - 16:21:59, karena shell script yang dijalankan untuk melakukan `mkdir` dengan `date` saat ini. Jika dilihat pada `ps`, program `soal1` masih berjalan dan menunggu sampai jam 16 dan menit 21 berikutnya.
 
 **Isi File /home/umum/test.sh :**\
 ![Output Soal 1-2](https://user-images.githubusercontent.com/17781660/76400474-f8ef9200-63b2-11ea-8cc9-bd2f1141b83e.png)
 
 **Contoh Output Jika Arguments Salah:**\
 ![Output Soal 1-3](https://user-images.githubusercontent.com/17781660/76400520-0c026200-63b3-11ea-824a-725c0cb27696.png)
+Jika argument jam, menit, atau detik yang diinputkan tidak sesuai, maka program akan nge-*printf* Error dan menghentikan prosesnya.
 
 **Contoh Output Jika File Shell Script Tidak Ada:**\
 ![Output Soal 1-4](https://user-images.githubusercontent.com/17781660/76400554-17ee2400-63b3-11ea-9505-9270a6715594.png)
+Jika file yang diinputkan pada *argument* tidak ada, maka program akan nge-*printf* Error dan menghentikan prosesnya.
 
 ---
 
@@ -201,6 +210,9 @@ sebuah program.
 
 **Deskripsi:**\
 Pertama-tama, Kiwa membuat sebuah folder khusus, di dalamnya dia membuat sebuah program C yang per 30 detik membuat sebuah folder dengan nama timestamp \[YYYY-mm-dd_HH:ii:ss\].
+
+**Asumsi Soal:**\
+Kami berasumsi bahwa soal meminta untuk membuat Program C berupa daemon, dimana daemon tersebut akan berjalan setiap 30 detik dan akan melakukan `fork()` untuk melakukan `mkdir` dengan timestamp yang sesuai.
 
 **Pembahasan:**\
 Pertama, kami akan melakukan `#include` library yang diperlukan
@@ -288,6 +300,9 @@ Lalu, process akan di `fork()` dan *child process* akan melakukan `execv()` terh
 **Deskripsi:**\
 Tiap-tiap folder lalu diisi dengan 20 gambar yang di download dari *https://picsum.photos/*, dimana tiap gambar di download setiap 5 detik. Tiap gambar berbentuk persegi dengan ukuran *(`t`%1000)+100* piksel dimana `t` adalah detik Epoch Unix. Gambar tersebut diberi nama dengan format timestamp [YYYY-mm-dd_HH:ii:ss].
 
+**Asumsi Soal:**\
+Dari masing-masing folder yang telah dibuat, program akan melakukan `fork()` lagi dimana *child proces* akan melakukan `loop` sebanyak 20 kali. Dimana masing-masing loop akan melakukan `fork()` kembali untuk mendownload file di *https://picsum.photos/*. Agar ukuran sesuai dengan yang diminta, ukuran dapat diinputkan pada url tersebut (e.g. *https://picsum.photos/100* untuk mendownload file dengan ukuran 100x100 pixel). Lalu `loop` tersebut akan melakukan `sleep` selama 5 detik.
+
 **Pembahasan:**\
 Untuk menjawab soal 2.b. pertama kami membuat *child process* untuk melakukan download 20 gambar setelah *directory* dibuat pada bagian kode sebelumnya. Namun program utamanya tidak akan menunggu *child process*-nya (download gambar) dan langsung `sleep()` selama 30 detik setelah fungsi `fork()` dijalankan.
 
@@ -344,6 +359,9 @@ Lalu, pada masing-masing loop akan dibuat *child process* yang dimana masing-mas
 **Deskripsi:**\
 Agar rapi, setelah sebuah folder telah terisi oleh 20 gambar, folder akan di zip dan folder akan di delete(sehingga hanya menyisakan .zip).
 
+**Asumsi Soal:**\
+Proses ini dilakukan setelah loop untuk mendownload 20 gambar tadi telah selesai. Program akan melakukan `fork()` dan akan melakukan `execv` perintah `zip`.
+
 **Pembahasan:**\
 Untuk melakukan zip, maka setelah `for` loop pada soal sebelumnya selesai, *parent process* akan menunggu sampai seluruh ***download*** `wget` selesai. Lalu akan melakukan `fork()` lagi. Dimana *child process* akan melakukan zip terhadap folder tersebut. dan *parent process* akan menunggu *child process* selesai dan menghapus directory folder yang telah di zip.
 
@@ -368,6 +386,10 @@ execv("/bin/rm", argv);
 
 **Deskripsi:**\
 Karena takut program tersebut lepas kendali, Kiwa ingin program tersebut men-generate sebuah program "`killer`" **yang siap di run(executable)** untuk menterminasi semua operasi program tersebut. Setelah di run, program yang menterminasi ini lalu akan mendelete dirinya sendiri.
+
+**Asumsi Soal:**\
+Untuk men-generate program "`killer`", kami membuat file bernama `killer.c` dan menginputkannya dengan program c. Dimana program C tersebut akan melakukan `pkill` terhadap Session ID (**`SID`**) yang telah diset ketika melakukan daemon, dan melakukan `rm` terhadap file `killer`. Lalu Program C tersebut akan dicompile dengan `gcc` dan file `killer.c` akan di `rm`.
+
 
 **Pembahasan:**\
 Untuk men-generate sebuah program yang bisa menterminasi semua operasi program, kami pertama membuat file yang akan kami inputkan dengan kode **C**.
@@ -428,7 +450,10 @@ Lalu program utama akan membuat *child process* untuk melakukan *compile* terhad
 ### Soal 2.e.
 
 **Deskripsi:**\
-Kiwa menambahkan bahwa program **utama** bisa dirun dalam dua mode, yaitu MODE_A dan MODE_B. untuk mengaktifkan MODE_A, program harus dijalankan dengan argumen `-a`. Untuk MODE_B, program harus dijalankan dengan argumen `-b`. Ketika dijalankan dalam MODE_A, program utama akan langsung mengehntikan semua operasinya ketika program killer dijalankan. Untuk MODE_B, ketika program killer dijalankan, program utama akan berhenti tapi membiarkan proses di setiap folder yang masih berjalan sampai selesai(semua folder terisi gambar, terzip lalu di delete).
+Kiwa menambahkan bahwa program **utama** bisa dirun dalam dua mode, yaitu MODE_A dan MODE_B. untuk mengaktifkan MODE_A, program harus dijalankan dengan argumen `-a`. Untuk MODE_B, program harus dijalankan dengan argumen `-b`. Ketika dijalankan dalam MODE_A, program utama akan langsung mengehentikan semua operasinya ketika program killer dijalankan. Untuk MODE_B, ketika program killer dijalankan, program utama akan berhenti tapi membiarkan proses di setiap folder yang masih berjalan sampai selesai(semua folder terisi gambar, terzip lalu di delete).
+
+**Asumsi Soal:**\
+Untuk membuat mode, maka *arguments*-nya akan dicek terlebih dahulu dan harus sesuai. Prosesnya mirip dengan soal 2.d. Pertama akan membuat file `killer.c`, lalu jika *argument* yang diinputkan merupakan MODE_A, maka kodingan C yang diinputkan sama pada soal 2.d. dan jika *argument* yang diinputkan merupakan MODE_B, maka kodingan C yang diinputkan akan melakukan `kill` terhadap proses utamanya saja. Untuk mendapatkan Process ID (**`PID`**) dari proses utama dapat dengan fungsi `getpid()`, lalu program akan dicompile kembali menggunakan `gcc` dan file `killer.c` akan dihapus
 
 **Pembahasan:**\
 Untuk menerima *arguments*, maka pada `main()` harus ditambahkan parameter.
@@ -491,17 +516,24 @@ if (strcmp(argv[1], "-b") == 0) {
 
 Lalu, pada proses mendefinisian string untuk diinputkan pada [Soal 2.d.](#soal-2d), akan dicek untuk masing masing *arguments* dan akan diberikan input yang berbeda. Untuk *argument* `-a` akan menggunakan input yang sama dengan [Soal 2.d.](#soal-2d). Untuk *argument* `-b` akan menggunakan perintah `kill` kepada ***Process ID*** yang dimiliki oleh process utama. Untuk mendapatkannya, kami menggunakan fungsi `getpid()`. Lalu pada masing-masing mode akan diwrite pada `pFile` dengan input yang sesuai dan ***Session ID*** atau ***Process ID*** yang sesuai. Setelah itu, program itu akan di-*compile* dan di-*remove* dengan metode yang sama seperti [Soal 2.d.](#soal-2d).
 
+#### Kesulitan
+Tidak ada.
+
 #### ScreenShot
 
 **Contoh Output Berhasil dengan MODE_A:**\
 ![Output Soal 2-1](https://user-images.githubusercontent.com/17781660/76580476-ac1ad100-6502-11ea-98dd-eaf83b2b676a.png)
+Program akan dijalankan dengan MODE_A (`-a`). Setelah program dijalankan, maka akan muncul file `killer` yang dapat langsung dieksekusi. Ketika dilihat directory yang muncul, didalamnya ada 2 buah file yang telah didownload, dan akan lanjut sampai 20 file. Ketika dilihat proses yang sedang berjalan, maka akan terlihat soal2, dan beberapa *child process* masih berjalan. Ketika `killer` dijalankan, maka proses-proses tersebut akan langsung dibunuh sesuai dengan permintaan soal dengan MODE_A.
 
 **Contoh Output Berhasil dengan MODE_B:**\
 ![Output Soal 2-2](https://user-images.githubusercontent.com/17781660/76580535-dbc9d900-6502-11ea-89d8-ba3fd71e45da.png)
+Program akan dijalankan dengan MODE_B (`-b`). Setelah program dijalankan maka akan muncul file `killer` dan sama seperti MODE_A.
 ![Output Soal 2-3](https://user-images.githubusercontent.com/17781660/76580500-c05ece00-6502-11ea-929f-1fdfd67ff146.png)
+Ketika `killer` dijalankan, maka proses yang dibunuh hanya process utamanya saja sehingga *child process* akan menjadi *orphan process* yang dimana akan dikill oleh `init` ketika processnya telah selesai (tidak menjadi *zombie process*). Process wget, sampai zip directory akan terus berjalan. Ketika seluruh folder telah di-zip, maka process akan selesai dan dibunuh.
 
 **Contoh Output Jika Tidak Memasukkan MODE:**\
 ![Output Soal 2-4](https://user-images.githubusercontent.com/17781660/76580502-c18ffb00-6502-11ea-907b-2c075b432124.png))
+Jika tidak memasukkan mode, maka akan muncul Error.
 
 ---
 
@@ -521,6 +553,9 @@ Jaya adalah seorang programmer handal mahasiswa informatika. Suatu hari dia memp
 
 **Deskripsi:**\
 Program buatan jaya harus bisa membuat dua direktori di **"/home/[USER]/modul2/"**. Direktori yang pertama diberi nama **"indomie"**, lalu lima detik kemudian membuat direktori yang kedua bernama **"sedaap"**.
+
+**Asumsi Soal:**\
+Program ini tidak dijadikan daemon, pertama melakukan `fork()` untuk melakukan `mkdir` directory `/home/umum/modul2/indomie` lalu `sleep()` selama 5 detik dan `fork()` kembali untuk melakukan `mkdir` directory `/home/umum/modul2/sedaap`.
 
 **Pembahasan:**\
 Pertama, kami akan melakukan `#include` library yang diperlukan
@@ -572,6 +607,9 @@ int main() {
 **Deskripsi:**\
 Kemudian program tersebut harus meng-ekstrak file **jpg.zip** di direktori **"/home/[USER]/modul2/"**. Setelah tugas sebelumnya selesai, ternyata tidak hanya itu tugasnya.
 
+**Asumsi Soal:**\
+Untuk mengekstrak, dapat dilakukan dengan perintah `unzip`. Maka program akan melakukan `fork()` untuk menjalankan `unzip` tersebut.
+
 **Pembahasan:**\
 Untuk meng-ekstrak file **jpg.zip** dapat menggunakan perintah `unzip`.
 
@@ -592,6 +630,9 @@ while(wait(NULL) != child_id);
 
 **Deskripsi:**\
 Diberilah tugas baru yaitu setelah di ekstrak, hasil dari ekstrakan tersebut (di dalam direktori **"/home/[USER]/modul2/jpg/"**) harus dipindahkan sesuai dengan pengelompokan, semua file harus dipindahkan ke **"/home/[USER]/modul2/sedaap/"** dan semua direktori harus dipindahkan ke **"/home[USER]/modul2/indomie/"**.
+
+**Asumsi Soal:**\
+Untuk bagian soal ini, seluruh *entry* yang terdapat pada `/home/umum/modul2/jpg/` di list terlebih dahulu. Lalu akan dicek apakah *entry* tersebut merupakan file atau directory, jika file akan dipindahkan ke `/home/umum/modul2/sedaap`, dan jika directory akan dipindahkan ke `/home/umum/modul2/indomie`.
 
 **Pembahasan:**\
 Pertama, kami melakukan *entry* terhadap isi directory `/home/umum/modul2/jpg` menggunakan library `<dirent.h>`.
@@ -680,6 +721,9 @@ Untuk masing-masing nama *entry*, akan dilakukan operasi sebagai berikut:
 **Deskripsi:**\
 Untuk setiap direktori yang dipindahkan ke **"/home/[USER]/modul2/indomie/"** harus membuat dua file kosong. File yang pertama diberi nama **"coba1.txt"**, lalu 3 detik kemudian membuat file bernama **"coba2.txt"**. (contoh : **"/home/[USER]/modul2/indomie/{nama_folder}/coba1.txt"**).
 
+**Asumsi Soal:**\
+Pada soal 3.c. ketika direktori dipindahkan ke `/home/umum/modul2/indomie/`, process akan melakukan `fork()` dimana *child process* akan melakukan `fork()` lagi untuk membuat file `coba1.txt`, lalu `sleep()` selama 3 detik, dan membuat file `coba2.txt`.
+
 **Pembahasan:**\
 Proses ini dilakukan setelah *entry* bertipe directory dipindahkan menggunakan `mv`.
 
@@ -703,8 +747,13 @@ if (child_id == 0) {
 
 Pertama, kami mendeklarasikan variable `new_location` untuk menyimpan alamat directory yang telah dipindahkan. Lalu akan melakukan `fork()` dimana *child process* akan membuat file `coba1.txt` pada `new_location` menggunakan perintah `touch`. Lalu *parent process* akan melakukan `fork()` lagi, tetapi pada *child process* akan melakukan `sleep` selama 3 detik terlebih dahulu, lalu akan membuat file `coba2.txt` pada `new_location`.
 
+#### Kendala
+Tidak ada.
+
 #### ScreenShot
 
 **Contoh Output:**\
 ![Output Soal 3-1](https://user-images.githubusercontent.com/17781660/76583819-d83b4f80-650c-11ea-95a1-5fea99d9da36.png)
+Ketika program dijalankan, maka proses `mkdir`, `unzip`, `mv`, dan lain-lain akan langsung dijalankan secara berurutan. Sehingga ketika dilihat pada `/home/umum/modul2` akan langsung terdiri atas 3 directory `indomie`, `jpg`, dan `sedaap`. untuk directory `sedaap` akan terdiri atas file saja, dan directory `indomie` akan terdiri atas directory saja.
 ![Output Soal 3-2](https://user-images.githubusercontent.com/17781660/76583822-d96c7c80-650c-11ea-883e-94b13f7b0eee.png)
+Sebagai contoh, pada directory `/home/umum/modul2/indomie/3577.jpg/` dan `/home/umum/modul2/indomie/3985.txt/` akan terdiri atas 2 file dengan nama `coba1.txt` dan `coba2.txt`.
